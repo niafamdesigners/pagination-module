@@ -1,0 +1,274 @@
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <style>
+      /*pagination styles*/
+      .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+        margin: 20px 0;
+        flex-wrap: wrap;
+      }
+      .pagination button {
+        padding: 5px 15px;
+        cursor: pointer;
+        min-width: 40px;
+        border: 1px solid #ddd;
+        background: #fff;
+        border-radius: 4px;
+      }
+      .pagination button:hover:not(:disabled) {
+        background-color: #f0f0f0;
+      }
+      .pagination button.active {
+        background-color: #007bff;
+        color: #fff;
+        border-color: #007bff;
+      }
+      .pagination button:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+      .pagination .dots {
+        padding: 5px 15px;
+        cursor: default;
+      }
+      .pagination-info {
+        text-align: center;
+        margin: 10px 0;
+        color: #666;
+      }
+      .pagination .nav-button {
+        font-weight: 700;
+      }
+      @media (max-width: 767.98px) {
+        .pagination button {
+          min-width: 30px;
+          padding: 5px;
+        }
+        .pagination .dots {
+          padding: 5px;
+        }
+      }
+      /*filter styles*/
+      #remove-filter,
+      #remove-filter:active {
+        background-color: #e74c3c;
+      }
+      #remove-filter.show,
+      .filter-row {
+        display: flex;
+      }
+      .filter-row {
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        background-color: #f4f4f4;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        flex-wrap: wrap;
+      }
+      .filterText,
+      .from-date,
+      .to-date {
+        padding: 8px 12px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: 200px;
+        transition: border-color 0.3s;
+      }
+      .filterText:focus,
+      .from-date:focus,
+      .to-date:focus {
+        border-color: #007bff;
+        outline: 0;
+      }
+      #remove-filter {
+        padding: 8px 16px;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+        display: none;
+      }
+      #remove-filter:hover {
+        background-color: #c0392b;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- filter start -->
+    <div class="filter-row">
+      <input
+        type="text"
+        id="filterText1"
+        class="filterText"
+        name="filterText1"
+        placeholder="عنوان خبر ..."
+      />
+      <input
+        type="text"
+        class="from-date"
+        name="from-date"
+        placeholder="تاریخ شروع"
+      />
+      <input
+        type="text"
+        class="to-date"
+        name="to-date"
+        placeholder="تاریخ پایان"
+      />
+      <button id="remove-filter">حذف فیلتر</button>
+    </div>
+    <!-- filter end -->
+    <div>
+      <!-- container -->
+      <div id="contentContainer"></div>
+      <!-- pagination -->
+      <div id="paginationInfo" class="pagination-info"></div>
+      <div id="paginationContainer" class="pagination"></div>
+    </div>
+
+    <!-- persian date js -->
+    <link
+      rel="stylesheet"
+      href="/uploads/assets/css/persian-datepicker.min.css"
+    />
+    <script src="/uploads/assets/js/persian-date.js"></script>
+    <script src="/uploads/assets/js/persian-datepicker.js"></script>
+    <!-- pagination js  -->
+    <script src="/uploads/assets/js/pagination.js"></script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const filters = {searchValue: "", startDate: "", endDate: ""};
+
+        const totalCount = 1960//[query-result:cnt];
+        let typingTimer = null;
+        const TYPING_DELAY = 500;
+
+        // Function to fetch filtered data
+        async function fetchFilteredData(filters, page) {
+          $.ajax({
+            url: "/inc/ajax.ashx",
+            type: "POST",
+            data: {
+              action: "query",
+              qid: 284,
+              page: page,
+              ...filters
+            },
+            beforeSend: function () {
+              $("#contentContainer").html("در حال بارگزاری...");
+            },
+            success: function (res) {
+              $("#contentContainer").empty();
+              $("#contentContainer").html(res);
+              const totalItems = $("#contentContainer > [data-cnt]:first").attr("data-cnt") || 0;
+              pagination.updateTotal(totalItems);-
+            },
+          });
+        }
+
+        //init pagination
+        const pagination = new Pagination({
+          ajaxMode: false,
+          totalItems: totalCount,
+          itemsPerPage: 10,
+          visiblePages: 5,
+          paginationContainerId: 'paginationContainer',
+          paginationInfoId: 'paginationInfo',
+          baseUrl: '',
+          onPageChange: async (page) => {
+            if (pagination.ajaxMode) {
+              const searchFilter = document.getElementById('filterText1');
+              fetchFilteredData(filters, page);
+            }
+          },
+          firstText : '[esprit:translate:firstText]', //ابتدا
+          lastText : '[esprit:translate:lastText]', //انتها
+          prevText : '[esprit:translate:prevText]', //قبلی
+          nextText : '[esprit:translate:nextText]', //بعدی
+        });
+
+        // search input filter
+        const searchFilter = document.getElementById('filterText1');
+        searchFilter.addEventListener('keyup', (e) => {
+          clearTimeout(typingTimer);
+
+          typingTimer = setTimeout(() => {
+            //set filter searchValue
+            filters.searchValue = e.target.value.trim();
+            pagination.setAjaxMode(true);
+            fetchFilteredData(filters, 1);
+            document.getElementById("remove-filter").classList.add("show");
+          }, TYPING_DELAY);
+        });
+
+        //Date filter
+        var to, from;
+        to = $(".to-date").persianDatepicker({
+          altField: '.range-to-example-alt',
+          altFormat: 'LLLL',
+          initialValue: false,
+          onSelect: function (unix) {
+            to.touched = true;
+            if (from && from.options && from.options.maxDate != unix) {
+              var cachedValue = from.getState().selected.unixDate;
+              from.options = {maxDate: unix};
+              if (from.touched) {
+                from.setDate(cachedValue);
+              }
+            }
+            const date = new Date(unix);
+            //set filter endDate
+            filters.endDate = date.toISOString().slice(0, 19).replace("T", " ");
+            pagination.setAjaxMode(true);
+            fetchFilteredData(filters, 1);
+            document.getElementById("remove-filter").classList.add("show");
+          }
+        });
+        from = $(".from-date").persianDatepicker({
+          altField: '.range-from-example-alt',
+          altFormat: 'LLLL',
+          initialValue: false,
+          onSelect: function (unix) {
+            from.touched = true;
+            if (to && to.options && to.options.minDate != unix) {
+              var cachedValue = to.getState().selected.unixDate;
+              to.options = {minDate: unix};
+              if (to.touched) {
+                to.setDate(cachedValue);
+              }
+            }
+            const date = new Date(unix);
+            //set filter startDate
+            filters.startDate = date.toISOString().slice(0, 19).replace("T", " ");
+          }
+        });
+
+        //Remove all filters
+        document.getElementById("remove-filter").addEventListener('click', (e) => {
+          pagination.updateTotal(totalCount);
+          searchFilter.value = "";
+          to.value = "";
+          from.value = "";
+          filters.searchValue = "";
+          filters.startDate = "";
+          filters.endDate = "";
+          e.target.classList.remove("show");
+        //  pagination.goToPage(1); //use in ajax mode
+        //  fetchFilteredData(filters, 1); //use in ajax mode
+          pagination.setAjaxMode(false); //switch to normal pagination
+        });
+      });
+    </script>
+  </body>
+</html>
