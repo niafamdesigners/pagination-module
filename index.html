@@ -4,56 +4,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
 
+    <!-- persian date styles -->
+    <link
+      rel="stylesheet"
+      href="/uploads/assets/css/persian-datepicker.min.css"
+    />
+    <!-- Pagination styles -->
+    <link rel="stylesheet" href="/uploads/assets/css/pagination.css" />
     <style>
-      /*pagination styles*/
-      .pagination {
-        display: flex;
-        justify-content: center;
-        gap: 5px;
-        margin: 20px 0;
-        flex-wrap: wrap;
-      }
-      .pagination button {
-        padding: 5px 15px;
-        cursor: pointer;
-        min-width: 40px;
-        border: 1px solid #ddd;
-        background: #fff;
-        border-radius: 4px;
-      }
-      .pagination button:hover:not(:disabled) {
-        background-color: #f0f0f0;
-      }
-      .pagination button.active {
-        background-color: #007bff;
-        color: #fff;
-        border-color: #007bff;
-      }
-      .pagination button:disabled {
-        cursor: not-allowed;
-        opacity: 0.5;
-      }
-      .pagination .dots {
-        padding: 5px 15px;
-        cursor: default;
-      }
-      .pagination-info {
-        text-align: center;
-        margin: 10px 0;
-        color: #666;
-      }
-      .pagination .nav-button {
-        font-weight: 700;
-      }
-      @media (max-width: 767.98px) {
-        .pagination button {
-          min-width: 30px;
-          padding: 5px;
-        }
-        .pagination .dots {
-          padding: 5px;
-        }
-      }
       /*filter styles*/
       #remove-filter,
       #remove-filter:active {
@@ -137,20 +95,16 @@
     </div>
 
     <!-- persian date js -->
-    <link
-      rel="stylesheet"
-      href="/uploads/assets/css/persian-datepicker.min.css"
-    />
     <script src="/uploads/assets/js/persian-date.js"></script>
     <script src="/uploads/assets/js/persian-datepicker.js"></script>
     <!-- pagination js  -->
     <script src="/uploads/assets/js/pagination.js"></script>
 
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const filters = {searchValue: "", startDate: "", endDate: ""};
+      document.addEventListener("DOMContentLoaded", () => {
+        const filters = { searchValue: "", startDate: "", endDate: "" };
 
-        const totalCount = 1960//[query-result:cnt];
+        const totalCount = 1960; //[query-result:cnt];
         let typingTimer = null;
         const TYPING_DELAY = 500;
 
@@ -163,7 +117,7 @@
               action: "query",
               qid: 284,
               page: page,
-              ...filters
+              ...filters,
             },
             beforeSend: function () {
               $("#contentContainer").html("در حال بارگزاری...");
@@ -171,8 +125,9 @@
             success: function (res) {
               $("#contentContainer").empty();
               $("#contentContainer").html(res);
-              const totalItems = $("#contentContainer > [data-cnt]:first").attr("data-cnt") || 0;
-              pagination.updateTotal(totalItems);-
+              const totalItems =
+                $("#contentContainer > [data-cnt]:first").attr("data-cnt") || 0;
+              pagination.updateTotal(totalItems);
             },
           });
         }
@@ -183,24 +138,24 @@
           totalItems: totalCount,
           itemsPerPage: 10,
           visiblePages: 5,
-          paginationContainerId: 'paginationContainer',
-          paginationInfoId: 'paginationInfo',
-          baseUrl: '',
+          paginationContainerId: "paginationContainer",
+          paginationInfoId: "paginationInfo",
+          baseUrl: "",
           onPageChange: async (page) => {
             if (pagination.ajaxMode) {
-              const searchFilter = document.getElementById('filterText1');
+              const searchFilter = document.getElementById("filterText1");
               fetchFilteredData(filters, page);
             }
           },
-          firstText : '[esprit:translate:firstText]', //ابتدا
-          lastText : '[esprit:translate:lastText]', //انتها
-          prevText : '[esprit:translate:prevText]', //قبلی
-          nextText : '[esprit:translate:nextText]', //بعدی
+          firstText: "[esprit:translate:firstText]", //ابتدا
+          lastText: "[esprit:translate:lastText]", //انتها
+          prevText: "[esprit:translate:prevText]", //قبلی
+          nextText: "[esprit:translate:nextText]", //بعدی
         });
 
         // search input filter
-        const searchFilter = document.getElementById('filterText1');
-        searchFilter.addEventListener('keyup', (e) => {
+        const searchFilter = document.getElementById("filterText1");
+        searchFilter.addEventListener("keyup", (e) => {
           clearTimeout(typingTimer);
 
           typingTimer = setTimeout(() => {
@@ -215,14 +170,14 @@
         //Date filter
         var to, from;
         to = $(".to-date").persianDatepicker({
-          altField: '.range-to-example-alt',
-          altFormat: 'LLLL',
+          altField: ".range-to-example-alt",
+          altFormat: "LLLL",
           initialValue: false,
           onSelect: function (unix) {
             to.touched = true;
             if (from && from.options && from.options.maxDate != unix) {
               var cachedValue = from.getState().selected.unixDate;
-              from.options = {maxDate: unix};
+              from.options = { maxDate: unix };
               if (from.touched) {
                 from.setDate(cachedValue);
               }
@@ -233,41 +188,46 @@
             pagination.setAjaxMode(true);
             fetchFilteredData(filters, 1);
             document.getElementById("remove-filter").classList.add("show");
-          }
+          },
         });
         from = $(".from-date").persianDatepicker({
-          altField: '.range-from-example-alt',
-          altFormat: 'LLLL',
+          altField: ".range-from-example-alt",
+          altFormat: "LLLL",
           initialValue: false,
           onSelect: function (unix) {
             from.touched = true;
             if (to && to.options && to.options.minDate != unix) {
               var cachedValue = to.getState().selected.unixDate;
-              to.options = {minDate: unix};
+              to.options = { minDate: unix };
               if (to.touched) {
                 to.setDate(cachedValue);
               }
             }
             const date = new Date(unix);
             //set filter startDate
-            filters.startDate = date.toISOString().slice(0, 19).replace("T", " ");
-          }
+            filters.startDate = date
+              .toISOString()
+              .slice(0, 19)
+              .replace("T", " ");
+          },
         });
 
         //Remove all filters
-        document.getElementById("remove-filter").addEventListener('click', (e) => {
-          pagination.updateTotal(totalCount);
-          searchFilter.value = "";
-          to.value = "";
-          from.value = "";
-          filters.searchValue = "";
-          filters.startDate = "";
-          filters.endDate = "";
-          e.target.classList.remove("show");
-        //  pagination.goToPage(1); //use in ajax mode
-        //  fetchFilteredData(filters, 1); //use in ajax mode
-          pagination.setAjaxMode(false); //switch to normal pagination
-        });
+        document
+          .getElementById("remove-filter")
+          .addEventListener("click", (e) => {
+            pagination.updateTotal(totalCount);
+            searchFilter.value = "";
+            to.value = "";
+            from.value = "";
+            filters.searchValue = "";
+            filters.startDate = "";
+            filters.endDate = "";
+            e.target.classList.remove("show");
+            //  pagination.goToPage(1); //use in ajax mode
+            //  fetchFilteredData(filters, 1); //use in ajax mode
+            pagination.setAjaxMode(false); //switch to normal pagination
+          });
       });
     </script>
   </body>
