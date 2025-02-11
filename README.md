@@ -29,9 +29,9 @@ const pagination = new Pagination({
       fetchFilteredData(filters, page);
     }
   },
-  firstText: "[esprit:translate:firstText]", // "First" text translation
-  lastText: "[esprit:translate:lastText]", // "Last" text translation
-  prevText: "[esprit:translate:prevText]", // "Previous" text translation
-  nextText: "[esprit:translate:nextText]", // "Next" text translation
+  firstText: "First", // "First" text translation
+  lastText: "Last", // "Last" text translation
+  prevText: "Previous", // "Previous" text translation
+  nextText: "Next", // "Next" text translation
 });
 ```
