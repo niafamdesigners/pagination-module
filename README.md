@@ -36,7 +36,6 @@ const pagination = new Pagination({
   baseUrl: "", // Base URL for pagination
   onPageChange: async (page) => {
     if (pagination.ajaxMode) {
-      const searchFilter = document.getElementById("filterText1");
       fetchFilteredData(filters, page);
     }
   },
@@ -47,4 +46,4 @@ const pagination = new Pagination({
 });
 ```
 
-3. To properly reset pagination in Ajax mode, add `data-cnt='totalCount'` to each data item.
+3. To properly reset pagination in Ajax mode, add `data-cnt='[query-result:totalCount]'` to each data item.
