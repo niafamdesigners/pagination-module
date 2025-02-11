@@ -4,15 +4,26 @@ This is a pagination module that supports both standard and Ajax-based paginatio
 
 ## Installation
 
-Add `pagination.js` to your project by including the following script tag:
+Add `pagination.js` and `pagination.css` to your project by including the following tags:
 
 ```html
+<link rel="stylesheet" href="/uploads/assets/css/pagination.css" />
 <script src="/uploads/assets/js/pagination.js"></script>
 ```
 
 ## Usage
 
-Initialize the pagination module using the following configuration:
+1. Add the following HTML tags to your file:
+
+   ```html
+   <!-- Content Container -->
+   <div id="contentContainer"></div>
+   <!-- Pagination -->
+   <div id="paginationInfo" class="pagination-info"></div>
+   <div id="paginationContainer" class="pagination"></div>
+   ```
+
+2. Initialize the pagination module using the following configuration:
 
 ```js
 const pagination = new Pagination({
@@ -29,9 +40,11 @@ const pagination = new Pagination({
       fetchFilteredData(filters, page);
     }
   },
-  firstText: "First", // "First" text translation
-  lastText: "Last", // "Last" text translation
-  prevText: "Previous", // "Previous" text translation
-  nextText: "Next", // "Next" text translation
+  firstText: "First", // "First" button text
+  lastText: "Last", // "Last" button text
+  prevText: "Previous", // "Previous" button text
+  nextText: "Next", // "Next" button text
 });
 ```
+
+3. To properly reset pagination in Ajax mode, add `data-cnt='totalCount'` to each data item.
